@@ -1,0 +1,57 @@
+﻿using JWTTokenLogin.Controllers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+public class StartupTest
+{
+  public StartupTest(IConfiguration configuration)
+  {
+    Configuration = configuration;
+  }
+
+  public IConfiguration Configuration { get; }
+
+  // This method gets called by the runtime. Use this method to add services to the container.
+  public void ConfigureServices(IServiceCollection services)
+  {
+    services.AddMvc()
+      .AddApplicationPart(typeof(AuthController).Assembly);
+
+    services.AddMvcCore()
+      .AddApiExplorer();
+
+    services.AddAuthentication(o =>
+    {
+      o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+      o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+      o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(x =>
+    {
+      x.TokenValidationParameters = new TokenValidationParameters()
+      {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "lqueirozjr.com",
+        ValidAudience = "lqueirozjr.com",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("jhgayugwdjshdhjgdyugwd")),
+      };
+    });
+  }
+
+  // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+  public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+  {
+    if (env.IsDevelopment())
+    {
+      // app.UseDeveloperExceptionPage();
+    }
+
+    app.UseMvc();
+  }
+}
