@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Swagger;
 using System.Text;
 
 namespace JWTTokenLogin
@@ -22,7 +24,7 @@ namespace JWTTokenLogin
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddAuthentication(o => 
+      services.AddAuthentication(o =>
       {
         o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -40,7 +42,17 @@ namespace JWTTokenLogin
         };
       });
 
+      //services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("TodoList"));
+
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+      services.AddSwaggerGen(options =>
+       {
+         options.EnableAnnotations();
+         options.DescribeAllEnumsAsStrings();
+         options.DescribeStringEnumsInCamelCase();
+         options.SwaggerDoc("v1", new Info { Title = "JWTTokenLogin", Version = "v1" });
+       });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,6 +71,12 @@ namespace JWTTokenLogin
       app.UseAuthentication();
       app.UseHttpsRedirection();
       app.UseMvc();
+
+      app.UseSwagger();
+      app.UseSwaggerUI(opt =>
+      {
+        opt.SwaggerEndpoint("/swagger/v1/swagger.json", "JWTTokenLogin");
+      });
     }
   }
 }

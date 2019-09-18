@@ -45,7 +45,6 @@ public class Post_OK : BaseBDDTestFixture
       {
         //username and password in a base64 text
         var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes("Admin:Admin"));
-        //client.DefaultRequestHeaders.Add("Authorization", "Basic " + credentials);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
         _postToken = client.PostAsync("/api/auth/token", postContent).Result;
         _token = _postToken.Content.ReadAsStringAsync().Result;
